@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Wishes for Peace 💝</title>
+<script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+<script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+<script src="https://resource.trickle.so/trickle-sdk.js"></script>
+<style type="text/tailwindcss">
+@layer theme {
+    :root {
+        --bg-cream: #fffbf1;
+        --primary-pink: #d946a6;
+        --dark-pink: #c026d3;
+        --magenta: #d946ef;
+        --light-pink: #fae8ff;
+    }
+}
+@layer base {
+    body { background-color: var(--bg-cream); }
+}
+@layer utilities {
+    .gradient-pink { background: linear-gradient(135deg, var(--primary-pink) 0%, var(--dark-pink) 50%, var(--magenta) 100%); }
+    .text-gradient { background: linear-gradient(135deg, var(--primary-pink), var(--magenta)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+
+// ---------------- Error Boundary ----------------
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError(error) { return { hasError: true }; }
+  componentDidCatch(error, errorInfo) { console.error('ErrorBoundary caught:', error, errorInfo); }
+  render() { 
+    if (this.state.hasError) return <div className="min-h-screen flex items-center justify-center bg-[var(--bg-cream)]"><h1 className="text-2xl font-bold">Something went wrong</h1></div>;
+    return this.props.children;
+  }
+}
+
+// ---------------- Wishes App ----------------
+function WishesApp() {
+  const [wishes,setWishes] = React.useState([]);
+  const [name,setName] = React.useState('');
+  const [message,setMessage] = React.useState('');
+  const [showForm,setShowForm] = React.useState(false);
+  const [loading,setLoading] = React.useState(true);
+  const [saving,setSaving] = React.useState(false);
+
+  React.useEffect(()=>{ loadWishes(); },[]);
+
+  const loadWishes = async ()=>{
+    setLoading(true);
+    try {
+      const result = await trickleListObjects('birthday_wish', 100, true);
+      setWishes(result.items||[]);
+    } catch(err){ console.error('Load wishes error:',err); }
+    setLoading(false);
+  };
+
+  const handleSubmit = async (e)=>{
+    e.preventDefault();
+    if(!name.trim()||!message.trim()) return;
+    setSaving(true);
+    try{
+      await trickleCreateObject('birthday_wish',{name:name.trim(), message:message.trim()});
+      setName(''); setMessage(''); setShowForm(false);
+      await loadWishes();
+    } catch(err){
+      console.error('Save wish error:',err);
+      alert('Failed to save wish. Check console for details.');
+    } finally{ setSaving(false); }
+  };
+
+  return (
+    <div className="min-h-screen">
+      <header className="gradient-pink py-6 px-4 shadow-lg">
+        <div className="max-w-6xl mx-auto flex justify-between items-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-white">Birthday Wishes 💝</h1>
+          <button onClick={()=>setShowForm(!showForm)} className="px-6 py-3 gradient-pink text-white rounded-full">{showForm?'Close':'Add Wish'}</button>
+        </div>
+      </header>
+
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        {showForm && (
+          <form onSubmit={handleSubmit} className="mb-8 bg-white p-6 rounded-2xl shadow-md border-2 border-[var(--light-pink)]">
+            <input value={name} onChange={e=>setName(e.target.value)} placeholder="Your name" className="w-full mb-3 p-3 border rounded" required disabled={saving}/>
+            <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Your message" className="w-full mb-3 p-3 border rounded" rows="4" required disabled={saving}></textarea>
+            <button type="submit" disabled={saving} className="px-6 py-3 gradient-pink text-white rounded-full">{saving?'Sending...':'Send Wish'}</button>
+          </form>
+        )}
+
+        {loading ? (
+          <div className="text-center py-12">Loading wishes...</div>
+        ) : wishes.length===0 ? (
+          <div className="text-center py-12 text-gray-600">No wishes yet.</div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {wishes.map(wish=>(
+              <div key={wish.objectId} className="bg-white p-4 rounded-xl shadow border-[var(--light-pink)] border">
+                <h4 className="font-bold">{wish.objectData.name}</h4>
+                <p>{wish.objectData.message}</p>
+                <small className="text-gray-500">{new Date(wish.createdAt).toLocaleDateString()}</small>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<ErrorBoundary><WishesApp/></ErrorBoundary>);
+
+</script>
+
+</body>
+</html>

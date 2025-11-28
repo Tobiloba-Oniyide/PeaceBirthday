@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Message for Peace 💝</title>
+    <meta name="description" content="A special birthday message from Tobiloba to Peace">
+    
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://resource.trickle.so/vendor_lib/unpkg/lucide-static@0.516.0/font/lucide.css" rel="stylesheet">
+
+    <style type="text/tailwindcss">
+    @layer theme {
+        :root {
+            --bg-cream: #fffbf1;
+            --primary-pink: #d946a6;
+            --dark-pink: #c026d3;
+            --magenta: #d946ef;
+            --light-pink: #fae8ff;
+        }
+    }
+
+    @layer base {
+        body {
+            background-color: var(--bg-cream);
+        }
+    }
+
+    @layer utilities {
+        .gradient-pink {
+            background: linear-gradient(135deg, var(--primary-pink) 0%, var(--dark-pink) 50%, var(--magenta) 100%);
+        }
+        
+        .text-gradient {
+            background: linear-gradient(135deg, var(--primary-pink), var(--magenta));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel" src="components/IntroSection.js"></script>
+    <script type="text/babel" src="components/PhotoGallery.js"></script>
+    <script type="text/babel" src="components/SlideshowSection.js"></script>
+    <script type="text/babel" src="components/LongMessageSection.js"></script>
+    <script type="text/babel" src="components/ClosingSection.js"></script>
+    <script type="text/babel" src="message-app.js"></script>
+</body>
+</html>
